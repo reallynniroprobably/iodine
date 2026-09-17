@@ -5,7 +5,7 @@ A multi-language library + language for building modding APIs
 ### v1
 - [ ] Xenon documentation
   - [ ] Syntax spec
-    - [ ] Variables
+    - [x] Variables
     - [ ] Functions
     - [ ] Control statements
       - [ ] Loops
