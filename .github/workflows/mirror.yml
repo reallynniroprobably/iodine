@@ -1,0 +1,62 @@
+name: Mirror to Gitea
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["**"]
+  release:
+    types: [published, edited]
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mirror repository (without GitHub workflows)
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+        run: |
+          git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }} repo.git
+          cd repo.git
+
+          python3 -m pip install git-filter-repo
+
+          git filter-repo \
+            --path .github/workflows \
+            --invert-paths \
+            --force
+
+          git remote add mirror https://reallynniroprobably:${MIRROR_TOKEN}@chookspace.com/reallynniroprobably/iodine.git
+          git push --mirror mirror
+
+      - name: Mirror wiki
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+        run: |
+          if git ls-remote https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git >/dev/null 2>&1; then
+            git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git wiki.git
+            cd wiki.git
+            git remote add mirror https://reallynniroprobably:${MIRROR_TOKEN}@chookspace.com/reallynniroprobably/iodine.wiki.git
+            git push --mirror mirror
+          else
+            echo "No wiki exists."
+          fi
+
+      - name: Sync release to Gitea
+        if: github.event_name == 'release'
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${MIRROR_TOKEN}" \
+            -H "Content-Type: application/json" \
+            https://chookspace.com/api/v1/repos/reallynniroprobably/iodine/releases \
+            -d @- <<EOF
+          {
+            "tag_name": "${{ github.event.release.tag_name }}",
+            "name": "${{ github.event.release.name }}",
+            "body": ${{ toJson(github.event.release.body) }},
+            "draft": ${{ github.event.release.draft }},
+            "prerelease": ${{ github.event.release.prerelease }}
+          }
+          EOF
