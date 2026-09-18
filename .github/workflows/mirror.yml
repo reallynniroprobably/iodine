@@ -26,8 +26,8 @@ jobs:
             --invert-paths \
             --force
 
-          git remote set-url origin https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.git
-          git push --mirror --force
+          git remote add mirror https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.git
+          git push --mirror mirror
 
       - name: Mirror wiki
         env:
@@ -36,8 +36,8 @@ jobs:
           if git ls-remote https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git >/dev/null 2>&1; then
             git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git wiki.git
             cd wiki.git
-            git remote set-url origin https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.wiki.git
-            git push --mirror
+            git remote add mirror https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.wiki.git
+            git push --mirror mirror
           else
             echo "No wiki exists."
           fi
