@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Mirror repository
         env:
-          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+          GITEA_TOKEN: ${{ secrets.MIRROR_TOKEN }}
         run: |
           git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }} repo.git
           cd repo.git
