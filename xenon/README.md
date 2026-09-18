@@ -1,4 +1,4 @@
-# Xenon
+![](assets/wordmark.svg)
 # Roadmap
 ## Documentation
 - [ ] Syntax spec
