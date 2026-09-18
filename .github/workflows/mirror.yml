@@ -12,14 +12,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Mirror repository
+      - name: Mirror repository (without GitHub workflows)
         env:
-          GITEA_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
         run: |
           git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }} repo.git
           cd repo.git
+
+          python3 -m pip install git-filter-repo
+
+          git filter-repo \
+            --path .github/workflows \
+            --invert-paths \
+            --force
+
           git remote set-url origin https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.git
-          git push --mirror
+          git push --mirror --force
 
       - name: Mirror wiki
         env:
@@ -34,7 +42,7 @@ jobs:
             echo "No wiki exists."
           fi
 
-      - name: Sync latest release
+      - name: Sync release to Gitea
         if: github.event_name == 'release'
         env:
           GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
@@ -47,9 +55,7 @@ jobs:
           {
             "tag_name": "${{ github.event.release.tag_name }}",
             "name": "${{ github.event.release.name }}",
-            "body": ${{
-              toJson(github.event.release.body)
-            }},
+            "body": ${{ toJson(github.event.release.body) }},
             "draft": ${{ github.event.release.draft }},
             "prerelease": ${{ github.event.release.prerelease }}
           }
