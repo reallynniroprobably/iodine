@@ -1,6 +1,6 @@
 # Syntax
 ## Basics
-(Any statement that doesn't specify otherwise ends with a semicolon)
+###### (Any statement that doesn't specify otherwise ends with a semicolon)
 ### Variables
 You can define variables in Xenon with the keyword `let`, then the variable identifier. Type inference is not supported yet, so it is required to specify the data type on creation.
 ```
