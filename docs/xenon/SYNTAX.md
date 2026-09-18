@@ -7,7 +7,7 @@ You can define variables in Xenon with the keyword `let`, then the variable iden
 let foo: i64;
 let bar: bool = false;
 ```
-Variables are immutable by default, if you wish to modify a variable, replace the `let` keyword with `mut` in the variable definition:
+Variables are immutable by default, if you wish to modify a variable, replace the `let` keyword with `mut` in the variable definition.
 ```
 mut foo: string = "Hello world!";
 foo = "Xenon > Solstice";
