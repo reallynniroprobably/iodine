@@ -1,14 +1,13 @@
 # Iodine
 A multi-language library + language for building modding APIs
 
-## Roadmap
-### v1
-- [ ] Xenon documentation
+# Roadmap
+## Documentation
+- [ ] Xenon
   - [ ] Syntax spec
     - [x] Variables
     - [x] Functions
     - [ ] Control statements
       - [ ] Loops
       - [ ] Conditionals
-- [ ] Iodine documentation
-- [ ] Xenon WASM compiler
+- [ ] Iodine
