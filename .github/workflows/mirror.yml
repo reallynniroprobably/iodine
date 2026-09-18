@@ -4,7 +4,8 @@ on:
   push:
     branches: ["**"]
     tags: ["**"]
-  workflow_dispatch:
+  release:
+    types: [published, edited]
 
 jobs:
   mirror:
@@ -17,7 +18,39 @@ jobs:
         run: |
           git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }} repo.git
           cd repo.git
-
-          git remote set-url origin https://reallynniroprobably:$GITEA_TOKEN@chookspace.com/reallynniroprobably/iodine.git
-
+          git remote set-url origin https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.git
           git push --mirror
+
+      - name: Mirror wiki
+        env:
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+        run: |
+          if git ls-remote https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git >/dev/null 2>&1; then
+            git clone --mirror https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git wiki.git
+            cd wiki.git
+            git remote set-url origin https://reallynniroprobably:${GITEA_TOKEN}@chookspace.com/reallynniroprobably/iodine.wiki.git
+            git push --mirror
+          else
+            echo "No wiki exists."
+          fi
+
+      - name: Sync latest release
+        if: github.event_name == 'release'
+        env:
+          GITEA_TOKEN: ${{ secrets.GITEA_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${GITEA_TOKEN}" \
+            -H "Content-Type: application/json" \
+            https://chookspace.com/api/v1/repos/reallynniroprobably/iodine/releases \
+            -d @- <<EOF
+          {
+            "tag_name": "${{ github.event.release.tag_name }}",
+            "name": "${{ github.event.release.name }}",
+            "body": ${{
+              toJson(github.event.release.body)
+            }},
+            "draft": ${{ github.event.release.draft }},
+            "prerelease": ${{ github.event.release.prerelease }}
+          }
+          EOF
